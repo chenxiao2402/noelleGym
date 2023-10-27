@@ -5,9 +5,9 @@ logFiles="$@";
 
 echo "CondorWait Start" ;
 
-for logFile in $logFiles ; do
-  echo "condor_wait $logFile" ;
-  condor_wait $logFile ;
+for logFile in ${logFiles} ; do
+  echo "condor_wait ${logFile}" ;
+  condor_wait ${logFile} ;
 done
 
 

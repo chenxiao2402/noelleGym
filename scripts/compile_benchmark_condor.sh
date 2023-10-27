@@ -2,10 +2,6 @@
 
 function compile_benchmark {
 
-  echo SUITE_OF_BENCH ;
-  echo ${suiteOfBench} ;
-  echo ${benchToOptimize} ;
-
   # Check if the benchmark has been optimized already
   if test -e ${origDir}/results/current_machine/IR/${suiteOfBench}/benchmarks/${benchToOptimize}/baseline_with_metadata.bc ; then
     return ;
@@ -52,7 +48,7 @@ function compile_benchmark {
   cp ${origDir}/makefiles/${suiteOfBench}/NONE/* makefiles/ ;
 
   # The benchmark needs to be optimized
-  echo "    Compile the benchmark ${benchToOptimize}" ;
+  echo "    Compile the benchmark ${suiteOfBench}/${benchToOptimize}" ;
   make optimization BENCHMARK=${benchToOptimize} ;
 
   return ;

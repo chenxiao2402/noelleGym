@@ -27,7 +27,7 @@ function compile_suite {
 
   for bench in `ls ${benchmarksFolder}` ; do
     # compile_benchmark $suite $bench ;
-    benchmarkJobfile=$(./bin/submitCondor "default" "scripts" "compile_benchmark_condor" "${suite} ${bench}" "output.txt");
+    benchmarkJobfile=$(./bin/submitCondor "default" "scripts" "compile_benchmark_condor" "'${suite} ${bench}'" "output.txt");
     condorJobfiles+=($benchmarkJobfile) ;
   done
 
@@ -53,8 +53,10 @@ if ! test -z ${NOELLE_SPEC} ; then
   compile_suite "SPEC2017" ;
 fi
 
+echo ${condorJobfiles[@]} ;
+
 # Wait until all jobs done
-./bin/condorWait $condorJobfiles;
+./bin/condorWait ${condorJobfiles[@]} ;
 
 # Cache the bitcode files
 outputDir="${origDir}/results/current_machine" ;
