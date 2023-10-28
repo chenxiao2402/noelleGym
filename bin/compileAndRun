@@ -53,7 +53,7 @@ echo "${prefixString}   Setup" ;
 
 # Compile the system and the benchmarks
 echo "${prefixString}   Compile" ;
-if [[ $useCondor = true ]] ; then
+if [[ ${useCondor} = true ]] ; then
   ./bin/compileWithCondor >> output.txt 2>&1 ;
 else
   ./bin/compile >> output.txt 2>&1 ;

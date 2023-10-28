@@ -1,6 +1,8 @@
 #!/bin/bash
 
-condorJobfiles=();
+condorDir="condor_jobs" ;
+benchLogFiles=();
+
 
 function compile_suite {
   local suite=$1 ;
@@ -21,14 +23,17 @@ function compile_suite {
 
   # Fetch the benchmarks that might need to be optimized
   echo "  Compile benchmarks included in the suite" ;
-  benchmarksFolder="`pwd`/benchmarks";
+  benchmarksDir="`pwd`/benchmarks";
 
   popd &>/dev/null ;
 
-  for bench in `ls ${benchmarksFolder}` ; do
+  for bench in `ls ${benchmarksDir}` ; do
+    if ! test -d ${benchmarksDir}/${bench} ; then
+      continue ;
+    fi
     # compile_benchmark $suite $bench ;
-    benchmarkJobfile=$(./bin/submitCondor "default" "scripts" "compile_benchmark_condor" "'${suite} ${bench}'" "output.txt");
-    condorJobfiles+=($benchmarkJobfile) ;
+    local benchLogFile=$(./bin/submitCondor "default" "scripts" "compile_benchmark_condor.sh" "'${suite} ${bench}'" "output.txt");
+    benchLogFiles+=($benchLogFile) ;
   done
 
   return ;
@@ -53,10 +58,17 @@ if ! test -z ${NOELLE_SPEC} ; then
   compile_suite "SPEC2017" ;
 fi
 
-echo ${condorJobfiles[@]} ;
 
 # Wait until all jobs done
-./bin/condorWait ${condorJobfiles[@]} ;
+./bin/condorWait ${benchLogFiles[@]} ;
+
+# Copy condor job outputs into output.txt
+# Echo of this script is redirected into output.txt, so no need for >>
+for benchLogFile in ${benchLogFiles[@]} ; do
+  benchOutputFile=${benchLogFile%".log"}.out ;
+  cat ${benchOutputFile} ;
+done
+
 
 # Cache the bitcode files
 outputDir="${origDir}/results/current_machine" ;
@@ -74,4 +86,5 @@ for i in `ls */benchmarks/*/noelle_output.txt` ; do
 
   # Copy the NOELLE output if it exists 
   cp ${dirName}/noelle_output.txt ${outputDir}/IR/${dirName}/baseline_with_metadata_noelle_output.txt ;
+
 done
